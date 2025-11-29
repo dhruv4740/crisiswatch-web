@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 
-const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:8000";
+// Hardcoded for production - Render backend
+const BACKEND_URL = process.env.BACKEND_URL || "https://crisiswatch-uoj4.onrender.com";
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
