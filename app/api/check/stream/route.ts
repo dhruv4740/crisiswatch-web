@@ -7,6 +7,7 @@ export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const claim = searchParams.get("claim");
   const language = searchParams.get("language") || "en";
+  const skipCache = searchParams.get("skip_cache") === "true";
 
   if (!claim) {
     return new Response(
@@ -20,6 +21,9 @@ export async function GET(request: NextRequest) {
     const backendUrl = new URL(`${BACKEND_URL}/api/check/stream`);
     backendUrl.searchParams.set("claim", claim);
     backendUrl.searchParams.set("language", language);
+    if (skipCache) {
+      backendUrl.searchParams.set("skip_cache", "true");
+    }
 
     const response = await fetch(backendUrl.toString(), {
       headers: {

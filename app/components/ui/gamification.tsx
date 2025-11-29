@@ -77,6 +77,7 @@ interface GamificationState {
 interface GamificationContextType {
   state: GamificationState;
   incrementClaimsChecked: (isCap?: boolean) => void;
+  resetStats: () => void;
   getBadges: () => Badge[];
   getUnlockedBadges: () => Badge[];
   getNextBadge: () => Badge | null;
@@ -363,11 +364,18 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
     return Math.round((state.capsFound / state.claimsChecked) * 100);
   }, [state.capsFound, state.claimsChecked]);
   
+  // Reset all stats to default
+  const resetStats = useCallback(() => {
+    setState(DEFAULT_STATE);
+    localStorage.removeItem("crisiswatch-gamification");
+  }, []);
+  
   return (
     <GamificationContext.Provider
       value={{
         state,
         incrementClaimsChecked,
+        resetStats,
         getBadges,
         getUnlockedBadges,
         getProgress,

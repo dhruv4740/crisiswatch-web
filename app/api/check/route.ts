@@ -6,7 +6,7 @@ const BACKEND_URL = process.env.BACKEND_URL || "https://crisiswatch-uoj4.onrende
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { claim, language = "en" } = body;
+    const { claim, language = "en", skip_cache = false } = body;
 
     if (!claim || typeof claim !== "string") {
       return NextResponse.json(
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         claim: claim.trim(),
         language,
-        skip_cache: false,
+        skip_cache,
       }),
     });
 

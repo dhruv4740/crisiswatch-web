@@ -522,6 +522,7 @@ function GamificationStats() {
 
 export function LiveDemo() {
   const { onClaimChecked } = useClaimCheck();
+  const { resetStats } = useGamification();
   const [inputValue, setInputValue] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
@@ -540,6 +541,7 @@ export function LiveDemo() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [searchedSources, setSearchedSources] = useState<string[]>([]);
   const [showHindi, setShowHindi] = useState(false);
+  const [skipCache, setSkipCache] = useState(false);
   const stepIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const eventSourceRef = useRef<EventSource | null>(null);
@@ -651,9 +653,11 @@ export function LiveDemo() {
   const clearHistory = useCallback(() => {
     setHistory([]);
     localStorage.removeItem("crisiswatch-history");
-    setToastMessage("History cleared");
+    resetStats(); // Clear gamification stats (this also removes from localStorage)
+    setSkipCache(true); // Force fresh checks after clearing
+    setToastMessage("History cleared - next checks will be fresh");
     setShowHistory(false);
-  }, []);
+  }, [resetStats]);
 
   const startStepProgression = useCallback(() => {
     setCurrentStep(0);
@@ -690,7 +694,7 @@ export function LiveDemo() {
     const response = await fetch("/api/check", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ claim }),
+      body: JSON.stringify({ claim, skip_cache: skipCache }),
     });
 
     if (!response.ok) {
@@ -718,7 +722,7 @@ export function LiveDemo() {
         eventSourceRef.current.close();
       }
 
-      const url = `/api/check/stream?claim=${encodeURIComponent(claim)}&language=en`;
+      const url = `/api/check/stream?claim=${encodeURIComponent(claim)}&language=en${skipCache ? '&skip_cache=true' : ''}`;
       const eventSource = new EventSource(url);
       eventSourceRef.current = eventSource;
 
