@@ -270,6 +270,8 @@ interface AnalysisResult {
   sources: number;
   time: string;
   explanation?: string;
+  explanationHindi?: string;
+  correction?: string;
   evidence?: Array<{
     source: string;
     snippet: string;
@@ -537,6 +539,7 @@ export function LiveDemo() {
   const [showHistory, setShowHistory] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [searchedSources, setSearchedSources] = useState<string[]>([]);
+  const [showHindi, setShowHindi] = useState(false);
   const stepIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const eventSourceRef = useRef<EventSource | null>(null);
@@ -762,6 +765,8 @@ export function LiveDemo() {
               sources: result.sources_checked,
               time: `${result.processing_time_seconds.toFixed(1)}s`,
               explanation: result.explanation,
+              explanationHindi: result.explanation_hindi,
+              correction: result.correction,
               evidence: result.evidence?.map((e: { source: string; snippet: string; url?: string; published_date?: string; reliability?: number }) => ({
                 source: e.source,
                 snippet: e.snippet,
@@ -1256,8 +1261,26 @@ export function LiveDemo() {
                         transition={{ delay: 0.3 }}
                         className="p-3 rounded-lg bg-primary-500/5 border border-primary-500/10"
                       >
-                        <p className="text-xs text-dark-500 mb-1">Here's the tea ☕:</p>
-                        <p className="text-dark-300 text-sm leading-relaxed">{result.explanation}</p>
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="text-xs text-dark-500">{showHindi ? "हिंदी में:" : "Here's the tea ☕:"}</p>
+                          {result.explanationHindi && (
+                            <button
+                              onClick={() => setShowHindi(!showHindi)}
+                              className="text-xs px-2 py-1 rounded-full bg-white/[0.05] hover:bg-white/[0.1] text-dark-400 hover:text-white transition-colors flex items-center gap-1"
+                            >
+                              {showHindi ? "🇬🇧 English" : "🇮🇳 हिंदी"}
+                            </button>
+                          )}
+                        </div>
+                        <p className="text-dark-300 text-sm leading-relaxed">
+                          {showHindi && result.explanationHindi ? result.explanationHindi : result.explanation}
+                        </p>
+                        {result.correction && (
+                          <div className="mt-3 pt-3 border-t border-white/[0.06]">
+                            <p className="text-xs text-dark-500 mb-1">Quick share:</p>
+                            <p className="text-dark-400 text-xs italic">{result.correction}</p>
+                          </div>
+                        )}
                       </motion.div>
                     )}
 

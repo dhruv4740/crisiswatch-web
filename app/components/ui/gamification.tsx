@@ -559,7 +559,9 @@ export function useClaimCheck() {
   
   const onClaimChecked = useCallback((verdict?: string) => {
     // Check if the verdict indicates false/misleading information (a "cap")
-    const isCap = verdict === 'FALSE' || verdict === 'MOSTLY_FALSE' || verdict === 'MISLEADING';
+    // Handle both uppercase and lowercase verdicts from the API
+    const v = (verdict || '').toLowerCase();
+    const isCap = v === 'false' || v === 'mostly_false' || v === 'misleading';
     incrementClaimsChecked(isCap);
   }, [incrementClaimsChecked]);
   
