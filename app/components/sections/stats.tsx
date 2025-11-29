@@ -9,29 +9,29 @@ import { FadeIn } from "../animations/motion";
 
 const stats = [
   {
+    value: 10,
+    suffix: "+",
+    label: "Sources Checked",
+    description: "Wikipedia, news sites, fact-checkers & more",
+  },
+  {
     value: 15,
-    suffix: "+",
-    label: "Data Sources",
-    description: "News APIs, social media, and fact-check databases",
-  },
-  {
-    value: 2.3,
     suffix: "s",
-    label: "Avg Response",
-    description: "Real-time verification and correction",
-    decimals: 1,
+    label: "Avg Check Time",
+    description: "Fast AI-powered verification",
+    decimals: 0,
   },
   {
-    value: 6,
-    suffix: "+",
-    label: "Languages",
-    description: "Supporting multilingual crisis response",
+    value: 95,
+    suffix: "%",
+    label: "Accuracy",
+    description: "On known false claims detection",
   },
   {
-    value: 24,
-    suffix: "/7",
-    label: "Monitoring",
-    description: "Continuous real-time surveillance",
+    value: 100,
+    suffix: "%",
+    label: "Free",
+    description: "No sign-up, no limits, no cap 🧢",
   },
 ];
 
