@@ -279,6 +279,21 @@ interface AnalysisResult {
     published_date?: string;
     reliability?: number;
   }>;
+  sideBySide?: {
+    claim_points: string[];
+    fact_points: string[];
+    discrepancies: string[];
+  };
+  misinformationAnalysis?: {
+    primary_issue: string;
+    tactics_detected: Array<{
+      name: string;
+      description: string;
+      detected_example: string;
+    }>;
+    context_missing: string[];
+    manipulation_techniques: string[];
+  };
 }
 
 interface HistoryItem {
@@ -713,6 +728,8 @@ export function LiveDemo() {
       time: data.data.time,
       explanation: data.data.explanation,
       evidence: data.data.evidence,
+      sideBySide: data.data.side_by_side,
+      misinformationAnalysis: data.data.misinformation_analysis,
     };
   };
 
@@ -778,6 +795,8 @@ export function LiveDemo() {
                 published_date: e.published_date,
                 reliability: e.reliability,
               })),
+              sideBySide: result.side_by_side,
+              misinformationAnalysis: result.misinformation_analysis,
             });
           } else if (data.type === "error") {
             eventSource.close();
@@ -1351,6 +1370,100 @@ export function LiveDemo() {
                             </div>
                           ))}
                         </div>
+                      </motion.div>
+                    )}
+
+                    {/* Side-by-Side Comparison */}
+                    {result.sideBySide && result.sideBySide.discrepancies && result.sideBySide.discrepancies.length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.5 }}
+                        className="mt-4 p-3 rounded-lg bg-gradient-to-br from-amber-500/10 to-orange-500/5 border border-amber-500/20"
+                      >
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="text-amber-400">⚖️</span>
+                          <p className="text-xs text-amber-300 font-medium">Claim vs Reality</p>
+                        </div>
+                        <div className="space-y-2">
+                          {result.sideBySide.discrepancies.slice(0, 3).map((discrepancy, idx) => (
+                            <div key={idx} className="flex items-start gap-2 text-xs">
+                              <span className="text-red-400 mt-0.5">✕</span>
+                              <span className="text-dark-300">{discrepancy}</span>
+                            </div>
+                          ))}
+                        </div>
+                        {result.sideBySide.fact_points && result.sideBySide.fact_points.length > 0 && (
+                          <div className="mt-3 pt-2 border-t border-amber-500/20">
+                            <p className="text-xs text-green-400 mb-1">✓ What's actually true:</p>
+                            <ul className="space-y-1">
+                              {result.sideBySide.fact_points.slice(0, 2).map((fact, idx) => (
+                                <li key={idx} className="text-xs text-dark-400 pl-3">{fact}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </motion.div>
+                    )}
+
+                    {/* Why False Explainer */}
+                    {result.misinformationAnalysis && (result.verdict === "FALSE" || result.verdict === "MOSTLY_FALSE") && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.6 }}
+                        className="mt-4 p-3 rounded-lg bg-gradient-to-br from-purple-500/10 to-pink-500/5 border border-purple-500/20"
+                      >
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="text-purple-400">🔍</span>
+                          <p className="text-xs text-purple-300 font-medium">Why This is Misleading</p>
+                        </div>
+                        
+                        {result.misinformationAnalysis.primary_issue && (
+                          <p className="text-sm text-dark-300 mb-3">{result.misinformationAnalysis.primary_issue}</p>
+                        )}
+
+                        {result.misinformationAnalysis.tactics_detected && result.misinformationAnalysis.tactics_detected.length > 0 && (
+                          <div className="mb-3">
+                            <p className="text-xs text-dark-500 mb-2">Tactics detected:</p>
+                            <div className="flex flex-wrap gap-1.5">
+                              {result.misinformationAnalysis.tactics_detected.map((tactic, idx) => (
+                                <span 
+                                  key={idx} 
+                                  className="px-2 py-1 text-xs rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30"
+                                  title={tactic.description}
+                                >
+                                  {tactic.name}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {result.misinformationAnalysis.context_missing && result.misinformationAnalysis.context_missing.length > 0 && (
+                          <div className="mt-2 pt-2 border-t border-purple-500/20">
+                            <p className="text-xs text-dark-500 mb-1">Missing context:</p>
+                            <ul className="space-y-1">
+                              {result.misinformationAnalysis.context_missing.slice(0, 2).map((ctx, idx) => (
+                                <li key={idx} className="text-xs text-dark-400 flex items-start gap-1">
+                                  <span className="text-yellow-400">!</span>
+                                  {ctx}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+
+                        {result.misinformationAnalysis.manipulation_techniques && result.misinformationAnalysis.manipulation_techniques.length > 0 && (
+                          <div className="mt-2 pt-2 border-t border-purple-500/20">
+                            <p className="text-xs text-dark-500 mb-1">Manipulation techniques:</p>
+                            <div className="flex flex-wrap gap-1">
+                              {result.misinformationAnalysis.manipulation_techniques.map((tech, idx) => (
+                                <span key={idx} className="text-xs text-red-400">• {tech}</span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </motion.div>
                     )}
                   </motion.div>

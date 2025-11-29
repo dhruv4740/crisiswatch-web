@@ -53,6 +53,8 @@ export async function POST(request: NextRequest) {
         correction: result.correction,
         sources: result.sources_checked,
         evidence: result.evidence || [],
+        side_by_side: result.side_by_side,
+        misinformation_analysis: result.misinformation_analysis,
         time: `${result.processing_time_seconds.toFixed(1)}s`,
         cached: result.cached,
       },
