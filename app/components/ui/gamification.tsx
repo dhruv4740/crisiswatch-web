@@ -67,8 +67,10 @@ interface GamificationState {
   claimsChecked: number;
   unlockedBadges: string[];
   lastCheckTime: number;
+  lastStreakDate: string; // YYYY-MM-DD format for tracking actual days
   streak: number;
   factScore: number;
+  todayChecks: number; // Track checks done today
 }
 
 interface GamificationContextType {
@@ -80,12 +82,28 @@ interface GamificationContextType {
   getProgress: () => number;
 }
 
+// Helper to get date string in YYYY-MM-DD format
+const getDateString = (date: Date = new Date()) => {
+  return date.toISOString().split('T')[0];
+};
+
+// Helper to check if two dates are consecutive
+const isConsecutiveDay = (prevDate: string, currentDate: string) => {
+  const prev = new Date(prevDate);
+  const curr = new Date(currentDate);
+  const diffTime = curr.getTime() - prev.getTime();
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays === 1;
+};
+
 const DEFAULT_STATE: GamificationState = {
   claimsChecked: 0,
   unlockedBadges: [],
   lastCheckTime: 0,
+  lastStreakDate: '',
   streak: 0,
   factScore: 0,
+  todayChecks: 0,
 };
 
 const GamificationContext = createContext<GamificationContextType | null>(null);
@@ -257,10 +275,32 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
     setState(prev => {
       const newCount = prev.claimsChecked + 1;
       const now = Date.now();
+      const today = getDateString();
       
-      // Calculate streak (within 24 hours)
-      const dayMs = 24 * 60 * 60 * 1000;
-      const newStreak = (now - prev.lastCheckTime) < dayMs ? prev.streak + 1 : 1;
+      // Calculate streak based on actual calendar days
+      let newStreak = prev.streak;
+      let newLastStreakDate = prev.lastStreakDate;
+      let newTodayChecks = prev.todayChecks;
+      
+      if (prev.lastStreakDate === '') {
+        // First ever check
+        newStreak = 1;
+        newLastStreakDate = today;
+        newTodayChecks = 1;
+      } else if (prev.lastStreakDate === today) {
+        // Same day - streak stays same, just increment today's count
+        newTodayChecks = prev.todayChecks + 1;
+      } else if (isConsecutiveDay(prev.lastStreakDate, today)) {
+        // Consecutive day - increment streak!
+        newStreak = prev.streak + 1;
+        newLastStreakDate = today;
+        newTodayChecks = 1;
+      } else {
+        // Streak broken - more than 1 day gap
+        newStreak = 1;
+        newLastStreakDate = today;
+        newTodayChecks = 1;
+      }
       
       // Calculate fact score (logarithmic growth)
       const newFactScore = Math.floor(100 * Math.log10(newCount + 1));
@@ -285,8 +325,10 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
         claimsChecked: newCount,
         unlockedBadges: newUnlockedBadges,
         lastCheckTime: now,
+        lastStreakDate: newLastStreakDate,
         streak: newStreak,
         factScore: newFactScore,
+        todayChecks: newTodayChecks,
       };
     });
   }, []);
@@ -436,16 +478,16 @@ export function BadgeDisplay({ className = "" }: { className?: string }) {
             {/* Stats */}
             <div className="grid grid-cols-3 gap-3 mb-4">
               <div className="text-center p-2 rounded-lg bg-white/[0.03]">
+                <p className="text-lg font-bold text-white">{state.todayChecks || 0}</p>
+                <p className="text-[10px] text-dark-500">Today</p>
+              </div>
+              <div className="text-center p-2 rounded-lg bg-white/[0.03]">
+                <p className="text-lg font-bold text-orange-400">{state.streak}</p>
+                <p className="text-[10px] text-dark-500">Day Streak 🔥</p>
+              </div>
+              <div className="text-center p-2 rounded-lg bg-white/[0.03]">
                 <p className="text-lg font-bold text-white">{state.claimsChecked}</p>
-                <p className="text-[10px] text-dark-500">Checks</p>
-              </div>
-              <div className="text-center p-2 rounded-lg bg-white/[0.03]">
-                <p className="text-lg font-bold text-white">{state.streak}</p>
-                <p className="text-[10px] text-dark-500">Streak 🔥</p>
-              </div>
-              <div className="text-center p-2 rounded-lg bg-white/[0.03]">
-                <p className="text-lg font-bold text-white">{unlockedBadges.length}</p>
-                <p className="text-[10px] text-dark-500">Badges</p>
+                <p className="text-[10px] text-dark-500">Total</p>
               </div>
             </div>
             

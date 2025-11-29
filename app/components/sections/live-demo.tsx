@@ -457,16 +457,16 @@ function GamificationStats() {
 
       <div className="grid grid-cols-3 gap-3 mb-4">
         <div className="text-center p-2 rounded-lg bg-white/[0.05]">
-          <p className="text-lg font-bold text-white">{state.claimsChecked}</p>
-          <p className="text-[10px] text-dark-500">Claims Checked</p>
+          <p className="text-lg font-bold text-white">{state.todayChecks || 0}</p>
+          <p className="text-[10px] text-dark-500">Today</p>
         </div>
         <div className="text-center p-2 rounded-lg bg-white/[0.05]">
           <p className="text-lg font-bold text-primary-400">{state.factScore}</p>
           <p className="text-[10px] text-dark-500">Fact Score</p>
         </div>
         <div className="text-center p-2 rounded-lg bg-white/[0.05]">
-          <p className="text-lg font-bold text-white">{unlockedBadges.length}/{BADGES.length}</p>
-          <p className="text-[10px] text-dark-500">Badges</p>
+          <p className="text-lg font-bold text-white">{state.claimsChecked}</p>
+          <p className="text-[10px] text-dark-500">Total</p>
         </div>
       </div>
 
