@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import confetti from "canvas-confetti";
 
 // Badge definitions
 export interface Badge {
@@ -97,63 +98,83 @@ export function useGamification() {
   return context;
 }
 
-// Confetti animation component
-function Confetti() {
-  const colors = ["#22c55e", "#6366f1", "#f97316", "#ec4899", "#eab308"];
-  const confettiCount = 50;
-  
-  return (
-    <div className="fixed inset-0 pointer-events-none z-[100]">
-      {[...Array(confettiCount)].map((_, i) => {
-        const color = colors[i % colors.length];
-        const left = Math.random() * 100;
-        const delay = Math.random() * 0.5;
-        const duration = 2 + Math.random() * 2;
-        const size = 8 + Math.random() * 8;
-        
-        return (
-          <motion.div
-            key={i}
-            className="absolute"
-            initial={{
-              top: "-10%",
-              left: `${left}%`,
-              rotate: 0,
-              scale: 1,
-            }}
-            animate={{
-              top: "110%",
-              rotate: 360 * (Math.random() > 0.5 ? 1 : -1),
-              scale: [1, 0.8, 1],
-            }}
-            transition={{
-              duration,
-              delay,
-              ease: "easeOut",
-            }}
-            style={{
-              width: size,
-              height: size,
-              backgroundColor: color,
-              borderRadius: Math.random() > 0.5 ? "50%" : "2px",
-            }}
-          />
-        );
-      })}
-    </div>
-  );
+// Fire canvas-confetti celebration
+function fireConfetti() {
+  const count = 200;
+  const defaults = {
+    origin: { y: 0.7 },
+    zIndex: 9999,
+  };
+
+  function fire(particleRatio: number, opts: confetti.Options) {
+    confetti({
+      ...defaults,
+      ...opts,
+      particleCount: Math.floor(count * particleRatio),
+    });
+  }
+
+  // Fire multiple bursts for a spectacular effect
+  fire(0.25, {
+    spread: 26,
+    startVelocity: 55,
+    colors: ["#22c55e", "#6366f1"],
+  });
+  fire(0.2, {
+    spread: 60,
+    colors: ["#f97316", "#ec4899"],
+  });
+  fire(0.35, {
+    spread: 100,
+    decay: 0.91,
+    scalar: 0.8,
+    colors: ["#eab308", "#06b6d4"],
+  });
+  fire(0.1, {
+    spread: 120,
+    startVelocity: 25,
+    decay: 0.92,
+    scalar: 1.2,
+    colors: ["#22c55e", "#6366f1", "#f97316"],
+  });
+  fire(0.1, {
+    spread: 120,
+    startVelocity: 45,
+    colors: ["#ec4899", "#eab308", "#06b6d4"],
+  });
+
+  // Side cannons for extra flair
+  setTimeout(() => {
+    confetti({
+      particleCount: 50,
+      angle: 60,
+      spread: 55,
+      origin: { x: 0, y: 0.65 },
+      colors: ["#22c55e", "#6366f1", "#f97316"],
+      zIndex: 9999,
+    });
+    confetti({
+      particleCount: 50,
+      angle: 120,
+      spread: 55,
+      origin: { x: 1, y: 0.65 },
+      colors: ["#ec4899", "#eab308", "#06b6d4"],
+      zIndex: 9999,
+    });
+  }, 250);
 }
 
 // Badge unlock notification
 function BadgeUnlockNotification({ badge, onClose }: { badge: Badge; onClose: () => void }) {
   useEffect(() => {
+    // Fire confetti on mount
+    fireConfetti();
     const timer = setTimeout(onClose, 5000);
     return () => clearTimeout(timer);
   }, [onClose]);
   
   return (
     <>
-      <Confetti />
       <motion.div
         initial={{ opacity: 0, scale: 0.5, y: 50 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}

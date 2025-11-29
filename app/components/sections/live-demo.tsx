@@ -10,6 +10,148 @@ import { FadeIn } from "../animations/motion";
 import { ShareVerdictButton } from "../ui/verdict-card";
 import { useClaimCheck, useGamification, BADGES } from "../ui/gamification";
 
+// Voice Input Hook
+function useVoiceInput() {
+  const [isListening, setIsListening] = useState(false);
+  const [transcript, setTranscript] = useState("");
+  const [isSupported, setIsSupported] = useState(false);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        setIsSupported(true);
+        recognitionRef.current = new SpeechRecognition();
+        recognitionRef.current.continuous = false;
+        recognitionRef.current.interimResults = true;
+        recognitionRef.current.lang = "en-US";
+
+        recognitionRef.current.onresult = (event) => {
+          const current = event.resultIndex;
+          const result = event.results[current];
+          setTranscript(result[0].transcript);
+        };
+
+        recognitionRef.current.onend = () => {
+          setIsListening(false);
+        };
+
+        recognitionRef.current.onerror = () => {
+          setIsListening(false);
+        };
+      }
+    }
+  }, []);
+
+  const startListening = useCallback(() => {
+    if (recognitionRef.current && !isListening) {
+      setTranscript("");
+      setIsListening(true);
+      recognitionRef.current.start();
+    }
+  }, [isListening]);
+
+  const stopListening = useCallback(() => {
+    if (recognitionRef.current && isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    }
+  }, [isListening]);
+
+  return { isListening, transcript, isSupported, startListening, stopListening };
+}
+
+// Skeleton Loader Component
+function SkeletonLoader({ className = "" }: { className?: string }) {
+  return (
+    <div className={`animate-pulse bg-gradient-to-r from-white/[0.03] via-white/[0.08] to-white/[0.03] bg-[length:200%_100%] rounded ${className}`}
+      style={{ animation: "shimmer 1.5s infinite" }}
+    />
+  );
+}
+
+// Pulsing Source Card during search
+function SearchingSourceCard({ source, isActive }: { source: string; isActive: boolean }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className={`relative px-3 py-2 rounded-lg border transition-all duration-300 ${
+        isActive 
+          ? "bg-primary-500/10 border-primary-500/30" 
+          : "bg-white/[0.02] border-white/[0.06]"
+      }`}
+    >
+      {isActive && (
+        <motion.div
+          className="absolute inset-0 rounded-lg bg-primary-500/5"
+          animate={{ opacity: [0.5, 1, 0.5] }}
+          transition={{ duration: 1, repeat: Infinity }}
+        />
+      )}
+      <div className="relative flex items-center gap-2">
+        {isActive ? (
+          <motion.div
+            className="w-2 h-2 rounded-full bg-primary-500"
+            animate={{ scale: [1, 1.5, 1] }}
+            transition={{ duration: 0.6, repeat: Infinity }}
+          />
+        ) : (
+          <svg className="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+        )}
+        <span className={`text-xs ${isActive ? "text-primary-400" : "text-dark-400"}`}>
+          {isActive ? `Searching ${source}...` : source}
+        </span>
+      </div>
+    </motion.div>
+  );
+}
+
+// Enhanced Loading Animation
+function EnhancedLoadingSpinner({ elapsedTime }: { elapsedTime: number }) {
+  return (
+    <div className="relative w-20 h-20">
+      {/* Outer ring */}
+      <motion.div
+        className="absolute inset-0 rounded-full border-2 border-primary-500/20"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+      />
+      {/* Middle ring */}
+      <motion.div
+        className="absolute inset-2 rounded-full border-2 border-t-primary-500 border-r-primary-500/50 border-b-transparent border-l-transparent"
+        animate={{ rotate: -360 }}
+        transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+      />
+      {/* Inner ring */}
+      <motion.div
+        className="absolute inset-4 rounded-full border-2 border-t-accent-500 border-r-transparent border-b-accent-500/50 border-l-transparent"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+      />
+      {/* Center */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <motion.span 
+          className="text-sm font-mono text-primary-400 font-bold"
+          animate={{ opacity: [1, 0.5, 1] }}
+          transition={{ duration: 1, repeat: Infinity }}
+        >
+          {elapsedTime}s
+        </motion.span>
+      </div>
+      {/* Glow effect */}
+      <motion.div
+        className="absolute inset-0 rounded-full bg-primary-500/10 blur-xl"
+        animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
+        transition={{ duration: 2, repeat: Infinity }}
+      />
+    </div>
+  );
+}
+
 // Helper function to format date in IST timezone
 const formatDateIST = (dateString?: string): string | null => {
   if (!dateString) return null;
@@ -390,10 +532,21 @@ export function LiveDemo() {
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [showHistory, setShowHistory] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [searchedSources, setSearchedSources] = useState<string[]>([]);
   const stepIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const eventSourceRef = useRef<EventSource | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  
+  // Voice input hook
+  const { isListening, transcript, isSupported: voiceSupported, startListening, stopListening } = useVoiceInput();
+  
+  // Update input when voice transcript changes
+  useEffect(() => {
+    if (transcript) {
+      setInputValue(transcript);
+    }
+  }, [transcript]);
 
   // Handle URL query params (from extension)
   useEffect(() => {
@@ -584,6 +737,7 @@ export function LiveDemo() {
           } else if (data.type === "source") {
             if (data.status === "searching") {
               setCurrentSource(data.source);
+              setSearchedSources(prev => [...prev, data.source]);
               setProgressMessage(`Reading ${data.source}...`);
             } else if (data.status === "found") {
               totalSourcesFound += data.count;
@@ -675,6 +829,7 @@ export function LiveDemo() {
     setResult(null);
     setError(null);
     setLastClaim(claim);
+    setSearchedSources([]);
     startStepProgression();
 
     try {
@@ -855,6 +1010,12 @@ export function LiveDemo() {
                 <span>to focus</span>
                 <span className="px-1.5 py-0.5 rounded bg-white/[0.05] font-mono">Enter</span>
                 <span>to check</span>
+                {voiceSupported && (
+                  <>
+                    <span className="text-dark-600">|</span>
+                    <span>🎤 Voice input available</span>
+                  </>
+                )}
               </div>
 
               <div className="relative mb-6">
@@ -863,9 +1024,41 @@ export function LiveDemo() {
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Paste that sus claim here... (Press Enter to check if it's cap)"
-                  className="w-full h-32 px-4 py-3 rounded-xl bg-white/[0.03] border border-white/[0.08] text-white placeholder:text-dark-500 resize-none focus:outline-none focus:border-primary-500/50 transition-colors"
+                  placeholder={isListening ? "🎤 Listening... Speak your claim" : "Paste that sus claim here... (Press Enter to check if it's cap)"}
+                  className={`w-full h-32 px-4 py-3 pr-14 rounded-xl bg-white/[0.03] border text-white placeholder:text-dark-500 resize-none focus:outline-none transition-colors ${
+                    isListening 
+                      ? "border-red-500/50 bg-red-500/5" 
+                      : "border-white/[0.08] focus:border-primary-500/50"
+                  }`}
                 />
+                
+                {/* Voice Input Button */}
+                {voiceSupported && (
+                  <motion.button
+                    onClick={isListening ? stopListening : startListening}
+                    disabled={isAnalyzing}
+                    className={`absolute top-3 right-3 p-2 rounded-lg transition-all disabled:opacity-50 ${
+                      isListening 
+                        ? "bg-red-500 text-white" 
+                        : "bg-white/[0.05] text-dark-400 hover:text-white hover:bg-white/[0.1]"
+                    }`}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    animate={isListening ? { scale: [1, 1.1, 1] } : {}}
+                    transition={isListening ? { repeat: Infinity, duration: 1 } : {}}
+                  >
+                    {isListening ? (
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <rect x="6" y="6" width="12" height="12" rx="2" />
+                      </svg>
+                    ) : (
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
+                      </svg>
+                    )}
+                  </motion.button>
+                )}
+                
                 <div className="absolute bottom-3 right-3">
                   <MagneticButton
                     variant="primary"
@@ -947,51 +1140,70 @@ export function LiveDemo() {
                       className="mb-6"
                     />
 
-                    <div className="relative w-16 h-16 mb-4">
-                      <motion.div
-                        className="absolute inset-0 rounded-full border-2 border-primary-500/20"
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                      />
-                      <motion.div
-                        className="absolute inset-2 rounded-full border-2 border-t-primary-500 border-r-transparent border-b-transparent border-l-transparent"
-                        animate={{ rotate: -360 }}
-                        transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-sm font-mono text-primary-400">{elapsedTime}s</span>
-                      </div>
-                    </div>
+                    {/* Enhanced Loading Spinner */}
+                    <EnhancedLoadingSpinner elapsedTime={elapsedTime} />
 
-                    {/* Current source being searched */}
-                    <AnimatePresence mode="wait">
-                      {currentSource && (
-                        <motion.div
-                          key={currentSource}
-                          initial={{ opacity: 0, y: 5 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -5 }}
-                          className="flex items-center justify-center gap-2 text-sm"
-                        >
-                          <span className="text-primary-400">👀</span>
-                          <span className="text-dark-300">Checking {currentSource}...</span>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-
-                    {/* Progress message or sources found */}
-                    {sourcesFound.length > 0 ? (
-                      <div className="text-xs text-dark-500 text-center mt-2">
-                        Got {sourcesFound.reduce((sum, s) => sum + s.count, 0)} receipts from{" "}
-                        {sourcesFound.map(s => s.name).join(", ")} 📑
-                      </div>
-                    ) : progressMessage ? (
-                      <p className="text-xs text-dark-500 text-center mt-2">{progressMessage}</p>
-                    ) : (
-                      <p className="text-xs text-dark-500 text-center mt-2">
-                        {backendAvailable ? "Digging for the truth rn... 🕵️" : "Demo mode active"}
-                      </p>
+                    {/* Live Source Cards */}
+                    {searchedSources.length > 0 && (
+                      <motion.div 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="w-full max-w-sm mt-6 space-y-2"
+                      >
+                        <p className="text-xs text-dark-500 text-center mb-2">Sources being checked:</p>
+                        <div className="grid grid-cols-2 gap-2">
+                          {searchedSources.slice(-4).map((source, idx) => (
+                            <SearchingSourceCard 
+                              key={source + idx} 
+                              source={source} 
+                              isActive={source === currentSource}
+                            />
+                          ))}
+                        </div>
+                      </motion.div>
                     )}
+
+                    {/* Skeleton Preview */}
+                    {searchedSources.length === 0 && (
+                      <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="w-full max-w-sm mt-6 space-y-3"
+                      >
+                        <div className="flex items-center gap-3">
+                          <SkeletonLoader className="w-8 h-8 rounded-full" />
+                          <div className="flex-1 space-y-2">
+                            <SkeletonLoader className="h-3 w-3/4" />
+                            <SkeletonLoader className="h-2 w-1/2" />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2">
+                          <SkeletonLoader className="h-16 rounded-lg" />
+                          <SkeletonLoader className="h-16 rounded-lg" />
+                          <SkeletonLoader className="h-16 rounded-lg" />
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* Progress message */}
+                    <motion.div 
+                      className="mt-4 text-center"
+                      animate={{ opacity: [0.5, 1, 0.5] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                    >
+                      {sourcesFound.length > 0 ? (
+                        <p className="text-xs text-primary-400">
+                          📑 Got {sourcesFound.reduce((sum, s) => sum + s.count, 0)} receipts from{" "}
+                          {sourcesFound.map(s => s.name).join(", ")}
+                        </p>
+                      ) : progressMessage ? (
+                        <p className="text-xs text-dark-400">{progressMessage}</p>
+                      ) : (
+                        <p className="text-xs text-dark-500">
+                          {backendAvailable ? "🕵️ Digging for the truth..." : "Demo mode active"}
+                        </p>
+                      )}
+                    </motion.div>
                   </motion.div>
                 ) : error ? (
                   <motion.div

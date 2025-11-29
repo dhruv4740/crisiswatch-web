@@ -169,8 +169,8 @@ export function VerdictCard({ claim, verdict, confidence, sources, evidence, onC
     // Opening quote decoration
     ctx.fillStyle = config.color + "60";
     ctx.font = "120px Georgia, serif";
-    ctx.fillText(""", width / 2 - 350, 360);
-    ctx.fillText(""", width / 2 + 350, 520);
+    ctx.fillText("\u201C", width / 2 - 350, 360);
+    ctx.fillText("\u201D", width / 2 + 350, 520);
     
     // Claim text
     ctx.fillStyle = "#ffffff";
@@ -271,37 +271,6 @@ export function VerdictCard({ claim, verdict, confidence, sources, evidence, onC
     ctx.fillStyle = config.color;
     ctx.font = "bold 20px system-ui, -apple-system, sans-serif";
     ctx.fillText("#FactOrCap #StopMisinformation", width / 2, 1280);
-    
-    return new Promise((resolve) => {
-      canvas.toBlob((blob) => resolve(blob), "image/png", 1.0);
-    });
-  }, [claim, verdict, confidence, sources, evidence, config]);
-    
-    // Sources stat
-    drawStatBox(ctx, statsStartX + statsWidth + statsGap, statsY, statsWidth, sources.toString(), "Sources", "#6366f1");
-    
-    // Verdict stat
-    const verdictShort = verdict === "TRUE" ? "✓" : verdict === "FALSE" ? "✗" : "?";
-    drawStatBox(ctx, statsStartX + (statsWidth + statsGap) * 2, statsY, statsWidth, verdictShort, "Verdict", config.color);
-    
-    // Top sources (if available)
-    if (evidence && evidence.length > 0) {
-      ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
-      ctx.font = "14px system-ui, -apple-system, sans-serif";
-      ctx.textAlign = "center";
-      const sourcesText = evidence.slice(0, 3).map(e => e.source).join(" • ");
-      ctx.fillText(sourcesText, width / 2, 540);
-    }
-    
-    // Branding
-    ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
-    ctx.font = "bold 18px system-ui, -apple-system, sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText("🧢 Fact or Cap", width / 2, height - 40);
-    
-    ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
-    ctx.font = "14px system-ui, -apple-system, sans-serif";
-    ctx.fillText("factorcap.vercel.app", width / 2, height - 18);
     
     return new Promise((resolve) => {
       canvas.toBlob((blob) => resolve(blob), "image/png", 1.0);
