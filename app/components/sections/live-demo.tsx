@@ -8,7 +8,7 @@ import { GradientText, Badge } from "../ui/gradient-text";
 import { ProgressStepper, ConnectionStatus, ErrorDisplay } from "../ui/progress-stepper";
 import { FadeIn } from "../animations/motion";
 import { ShareVerdictButton } from "../ui/verdict-card";
-import { useClaimCheck } from "../ui/gamification";
+import { useClaimCheck, useGamification, BADGES } from "../ui/gamification";
 
 // Helper function to format date in IST timezone
 const formatDateIST = (dateString?: string): string | null => {
@@ -216,12 +216,14 @@ Checked with Fact or Cap 🧢`;
 // Recent history panel
 function RecentHistory({ 
   history, 
-  onSelect, 
+  onSelect,
+  onClear,
   isVisible, 
   onToggle 
 }: { 
   history: HistoryItem[]; 
   onSelect: (claim: string) => void;
+  onClear: () => void;
   isVisible: boolean;
   onToggle: () => void;
 }) {
@@ -229,17 +231,27 @@ function RecentHistory({
 
   return (
     <div className="mb-4">
-      <button
-        onClick={onToggle}
-        className="flex items-center gap-2 text-sm text-dark-400 hover:text-dark-300 transition-colors mb-2"
-      >
-        <svg className={`w-4 h-4 transition-transform ${isVisible ? "rotate-90" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-        </svg>
-        Recent checks ({history.length})
-      </button>
-      
-      <AnimatePresence>
+      <div className="flex items-center justify-between mb-2">
+        <button
+          onClick={onToggle}
+          className="flex items-center gap-2 text-sm text-dark-400 hover:text-dark-300 transition-colors"
+        >
+          <svg className={`w-4 h-4 transition-transform ${isVisible ? "rotate-90" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+          Recent checks ({history.length})
+        </button>
+        <button
+          onClick={onClear}
+          className="flex items-center gap-1 text-xs text-dark-500 hover:text-red-400 transition-colors"
+          title="Clear history"
+        >
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+          Clear
+        </button>
+      </div>      <AnimatePresence>
         {isVisible && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
@@ -275,7 +287,93 @@ function RecentHistory({
   );
 }
 
+// Gamification Stats Component - visible in live demo section
+function GamificationStats() {
+  const { state, getUnlockedBadges, getNextBadge, getProgress } = useGamification();
+  const unlockedBadges = getUnlockedBadges();
+  const nextBadge = getNextBadge();
+  const progress = getProgress();
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="mt-6 p-4 rounded-xl bg-gradient-to-r from-primary-500/10 to-purple-500/10 border border-white/[0.08]"
+    >
+      <div className="flex items-center justify-between mb-3">
+        <h4 className="text-sm font-semibold text-white flex items-center gap-2">
+          <span>🧢</span> Your Fact-Checking Stats
+        </h4>
+        <div className="flex items-center gap-1">
+          {state.streak > 0 && (
+            <span className="text-xs px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-400">
+              🔥 {state.streak} day streak
+            </span>
+          )}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-3 mb-4">
+        <div className="text-center p-2 rounded-lg bg-white/[0.05]">
+          <p className="text-lg font-bold text-white">{state.claimsChecked}</p>
+          <p className="text-[10px] text-dark-500">Claims Checked</p>
+        </div>
+        <div className="text-center p-2 rounded-lg bg-white/[0.05]">
+          <p className="text-lg font-bold text-primary-400">{state.factScore}</p>
+          <p className="text-[10px] text-dark-500">Fact Score</p>
+        </div>
+        <div className="text-center p-2 rounded-lg bg-white/[0.05]">
+          <p className="text-lg font-bold text-white">{unlockedBadges.length}/{BADGES.length}</p>
+          <p className="text-[10px] text-dark-500">Badges</p>
+        </div>
+      </div>
+
+      {/* Badges */}
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-xs text-dark-400">Badges:</span>
+        <div className="flex gap-1">
+          {BADGES.map(badge => {
+            const isUnlocked = unlockedBadges.some(b => b.id === badge.id);
+            return (
+              <span
+                key={badge.id}
+                title={isUnlocked ? `${badge.name}: ${badge.description}` : `Locked: Check ${badge.requirement} claims`}
+                className={`text-lg ${isUnlocked ? '' : 'opacity-30 grayscale'}`}
+              >
+                {badge.icon}
+              </span>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Progress to next badge */}
+      {nextBadge && (
+        <div>
+          <div className="flex items-center justify-between text-xs mb-1">
+            <span className="text-dark-400">Next: {nextBadge.name} {nextBadge.icon}</span>
+            <span className="text-dark-500">{state.claimsChecked}/{nextBadge.requirement}</span>
+          </div>
+          <div className="h-2 rounded-full bg-white/[0.05] overflow-hidden">
+            <motion.div
+              className={`h-full rounded-full bg-gradient-to-r ${nextBadge.gradient}`}
+              initial={{ width: 0 }}
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+            />
+          </div>
+        </div>
+      )}
+
+      {!nextBadge && (
+        <p className="text-xs text-center text-primary-400">🎉 You've unlocked all badges!</p>
+      )}
+    </motion.div>
+  );
+}
+
 export function LiveDemo() {
+  const { onClaimChecked } = useClaimCheck();
   const [inputValue, setInputValue] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
@@ -296,6 +394,24 @@ export function LiveDemo() {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const eventSourceRef = useRef<EventSource | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Handle URL query params (from extension)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const claimParam = params.get("claim");
+    if (claimParam) {
+      setInputValue(claimParam);
+      // Auto-scroll to demo section
+      const demoSection = document.getElementById("demo");
+      if (demoSection) {
+        setTimeout(() => demoSection.scrollIntoView({ behavior: "smooth" }), 100);
+      }
+      // Auto-trigger analysis
+      setTimeout(() => performAnalysis(claimParam), 500);
+      // Clear URL params
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
 
   // Load history from localStorage on mount
   useEffect(() => {
@@ -370,6 +486,13 @@ export function LiveDemo() {
       const filtered = prev.filter(h => h.claim !== result.claim);
       return [newItem, ...filtered].slice(0, 10);
     });
+  }, []);
+
+  const clearHistory = useCallback(() => {
+    setHistory([]);
+    localStorage.removeItem("crisiswatch-history");
+    setToastMessage("History cleared");
+    setShowHistory(false);
   }, []);
 
   const startStepProgression = useCallback(() => {
@@ -583,6 +706,7 @@ export function LiveDemo() {
       stopStepProgression();
       setResult(analysisResult);
       addToHistory(analysisResult);
+      onClaimChecked();
     } catch (err) {
       stopStepProgression();
       setError(err instanceof Error ? err.message : "An unexpected error occurred. Please try again.");
@@ -654,6 +778,7 @@ export function LiveDemo() {
       stopStepProgression();
       setResult(analysisResult);
       addToHistory(analysisResult);
+      onClaimChecked();
     } catch {
       stopStepProgression();
       setResult({
@@ -767,6 +892,7 @@ export function LiveDemo() {
               <RecentHistory 
                 history={history}
                 onSelect={handleHistorySelect}
+                onClear={clearHistory}
                 isVisible={showHistory}
                 onToggle={() => setShowHistory(!showHistory)}
               />
@@ -998,6 +1124,9 @@ export function LiveDemo() {
                   </motion.div>
                 )}
               </AnimatePresence>
+
+              {/* Gamification Stats - Show your progress */}
+              <GamificationStats />
             </GlassCard>
           </FadeIn>
         </div>

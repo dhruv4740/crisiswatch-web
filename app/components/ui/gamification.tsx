@@ -4,7 +4,7 @@ import { createContext, useContext, useState, useEffect, useCallback, ReactNode 
 import { motion, AnimatePresence } from "framer-motion";
 
 // Badge definitions
-interface Badge {
+export interface Badge {
   id: string;
   name: string;
   description: string;
@@ -14,7 +14,7 @@ interface Badge {
   gradient: string;
 }
 
-const BADGES: Badge[] = [
+export const BADGES: Badge[] = [
   {
     id: "first_check",
     name: "First Check",
