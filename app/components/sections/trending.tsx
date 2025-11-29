@@ -209,17 +209,20 @@ export function Trending() {
 
   return (
     <section id="trending" className="relative py-24 overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-dark-950 via-dark-900 to-dark-950" />
+      {/* Background - matching hero style */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0b] via-[#0d0c0a] to-[#0a0a0b]" />
       <div
-        className="absolute inset-0 opacity-[0.02]"
+        className="absolute inset-0 opacity-[0.015]"
         style={{
-          backgroundImage: "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0)",
-          backgroundSize: "40px 40px",
+          backgroundImage: "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.3) 1px, transparent 0)",
+          backgroundSize: "50px 50px",
         }}
       />
-      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-accent-500/5 rounded-full blur-[150px]" />
-      <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-primary-500/5 rounded-full blur-[150px]" />
+      
+      {/* Warm accent glows */}
+      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-amber-500/5 rounded-full blur-[180px]" />
+      <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-red-900/5 rounded-full blur-[150px]" />
+      <div className="absolute top-1/2 right-0 w-80 h-80 bg-primary-500/5 rounded-full blur-[120px]" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8">
         {/* Header */}

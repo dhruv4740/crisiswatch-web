@@ -957,16 +957,20 @@ export function LiveDemo() {
 
   return (
     <section id="demo" className="relative py-32 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-dark-900 via-dark-950 to-dark-900" />
+      {/* Background - matching hero style */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0b] via-[#0d0c0a] to-[#0a0a0b]" />
       <div
-        className="absolute inset-0 opacity-[0.02]"
+        className="absolute inset-0 opacity-[0.015]"
         style={{
-          backgroundImage: "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0)",
-          backgroundSize: "40px 40px",
+          backgroundImage: "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.3) 1px, transparent 0)",
+          backgroundSize: "50px 50px",
         }}
       />
-      <div className="absolute top-1/2 left-0 w-[600px] h-[600px] bg-primary-500/5 rounded-full blur-[200px] -translate-y-1/2" />
-      <div className="absolute top-1/2 right-0 w-[600px] h-[600px] bg-accent-500/5 rounded-full blur-[200px] -translate-y-1/2" />
+      
+      {/* Warm accent glows */}
+      <div className="absolute top-1/2 left-0 w-[600px] h-[600px] bg-amber-500/5 rounded-full blur-[200px] -translate-y-1/2" />
+      <div className="absolute top-1/2 right-0 w-[600px] h-[600px] bg-red-900/5 rounded-full blur-[180px] -translate-y-1/2" />
+      <div className="absolute top-0 left-1/2 w-[400px] h-[400px] bg-primary-500/5 rounded-full blur-[150px] -translate-x-1/2" />
 
       {/* Toast notification */}
       <AnimatePresence>

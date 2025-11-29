@@ -47,18 +47,28 @@ export function Stats() {
 
   return (
     <section ref={containerRef} className="relative py-32 overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0 bg-dark-950" />
+      {/* Background - matching hero style */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0d0c0a] via-[#0a0a0b] to-[#0d0c0a]" />
       
-      {/* Gradient orbs */}
+      {/* Subtle grid pattern */}
+      <div 
+        className="absolute inset-0 opacity-[0.015]"
+        style={{
+          backgroundImage: "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.3) 1px, transparent 0)",
+          backgroundSize: "50px 50px",
+        }}
+      />
+      
+      {/* Gradient orbs - warmer tones */}
       <motion.div
         style={{ y }}
-        className="absolute top-0 left-1/4 w-96 h-96 bg-primary-500/10 rounded-full blur-[150px]"
+        className="absolute top-0 left-1/4 w-[400px] h-[400px] bg-amber-500/6 rounded-full blur-[180px]"
       />
       <motion.div
         style={{ y: useTransform(scrollYProgress, [0, 1], [-30, 30]) }}
-        className="absolute bottom-0 right-1/4 w-80 h-80 bg-accent-500/10 rounded-full blur-[120px]"
+        className="absolute bottom-0 right-1/4 w-96 h-96 bg-red-900/5 rounded-full blur-[150px]"
       />
+      <div className="absolute top-1/2 right-0 w-80 h-80 bg-primary-500/5 rounded-full blur-[120px]" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8">
         {/* Section header */}

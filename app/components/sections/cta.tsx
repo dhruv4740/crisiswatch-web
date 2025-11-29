@@ -23,26 +23,25 @@ export function CTA() {
       id="cta"
       className="relative py-32 overflow-hidden"
     >
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-dark-950 to-dark-900" />
+      {/* Background - matching hero style */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0d0c0a] via-[#0a0a0b] to-[#0d0c0a]" />
 
-      {/* Animated gradient mesh */}
+      {/* Animated gradient mesh - warmer tones */}
       <motion.div
         style={{ y }}
         className="absolute inset-0 opacity-30"
       >
-        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-primary-500/20 rounded-full blur-[150px]" />
-        <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-accent-500/20 rounded-full blur-[150px]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-secondary-500/10 rounded-full blur-[200px]" />
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-amber-500/10 rounded-full blur-[180px]" />
+        <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-red-900/10 rounded-full blur-[150px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary-500/5 rounded-full blur-[200px]" />
       </motion.div>
 
       {/* Grid pattern overlay */}
       <div
-        className="absolute inset-0 opacity-[0.02]"
+        className="absolute inset-0 opacity-[0.015]"
         style={{
-          backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)",
-          backgroundSize: "100px 100px",
+          backgroundImage: "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.3) 1px, transparent 0)",
+          backgroundSize: "50px 50px",
         }}
       />
 

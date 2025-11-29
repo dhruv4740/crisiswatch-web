@@ -92,13 +92,13 @@ const socialLinks = [
 
 export function Footer() {
   return (
-    <footer className="relative bg-dark-950 pt-20 pb-8 overflow-hidden">
-      {/* Top border gradient */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary-500/50 to-transparent" />
+    <footer className="relative bg-[#0a0a0b] pt-20 pb-8 overflow-hidden">
+      {/* Top border gradient - warmer tone */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
 
-      {/* Background elements */}
-      <div className="absolute bottom-0 left-1/4 w-[500px] h-[500px] bg-primary-500/5 rounded-full blur-[200px]" />
-      <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-accent-500/5 rounded-full blur-[200px]" />
+      {/* Background elements - warmer tones */}
+      <div className="absolute bottom-0 left-1/4 w-[500px] h-[500px] bg-amber-900/5 rounded-full blur-[200px]" />
+      <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-red-900/5 rounded-full blur-[200px]" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8">
         {/* Main footer content */}

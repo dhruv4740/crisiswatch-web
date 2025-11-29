@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 
@@ -338,13 +338,57 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
 export function BadgeDisplay({ className = "" }: { className?: string }) {
   const { state, getUnlockedBadges, getNextBadge, getProgress } = useGamification();
   const [isExpanded, setIsExpanded] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
   
   const unlockedBadges = getUnlockedBadges();
   const nextBadge = getNextBadge();
   const progress = getProgress();
   
+  // Close on scroll
+  useEffect(() => {
+    if (!isExpanded) return;
+    
+    const handleScroll = () => setIsExpanded(false);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [isExpanded]);
+  
+  // Close on click outside
+  useEffect(() => {
+    if (!isExpanded) return;
+    
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsExpanded(false);
+      }
+    };
+    
+    // Small delay to prevent immediate close on the click that opened it
+    const timer = setTimeout(() => {
+      document.addEventListener("click", handleClickOutside);
+    }, 100);
+    
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [isExpanded]);
+  
+  // Close on escape key
+  useEffect(() => {
+    if (!isExpanded) return;
+    
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsExpanded(false);
+    };
+    
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [isExpanded]);
+  
   return (
     <motion.div
+      ref={containerRef}
       className={`relative ${className}`}
       initial={false}
     >

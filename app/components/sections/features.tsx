@@ -84,16 +84,28 @@ export function Features() {
       ref={containerRef}
       className="relative py-32 overflow-hidden"
     >
-      {/* Background elements */}
-      <div className="absolute inset-0 bg-dark-950" />
+      {/* Background elements - matching hero style */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0d0c0a] via-[#0a0a0b] to-[#0d0c0a]" />
+      
+      {/* Subtle grid pattern */}
+      <div 
+        className="absolute inset-0 opacity-[0.015]"
+        style={{
+          backgroundImage: "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.3) 1px, transparent 0)",
+          backgroundSize: "50px 50px",
+        }}
+      />
+      
+      {/* Warm accent glows */}
       <motion.div
         style={{ y }}
-        className="absolute top-1/2 -left-40 w-80 h-80 bg-primary-500/10 rounded-full blur-[100px]"
+        className="absolute top-1/2 -left-40 w-96 h-96 bg-amber-500/8 rounded-full blur-[150px]"
       />
       <motion.div
         style={{ y: useTransform(scrollYProgress, [0, 1], [-50, 50]) }}
-        className="absolute bottom-0 right-0 w-96 h-96 bg-accent-500/10 rounded-full blur-[120px]"
+        className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-primary-500/8 rounded-full blur-[180px]"
       />
+      <div className="absolute top-1/4 right-1/4 w-80 h-80 bg-red-900/5 rounded-full blur-[120px]" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8">
         {/* Section header */}
