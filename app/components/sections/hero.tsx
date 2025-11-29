@@ -159,7 +159,7 @@ function DataRain() {
       id: i,
       x: `${5 + i * 8}%`,
       // Use deterministic values based on index
-      chars: ["CAP", "🧢", "FAKE", "NAH", "CAP", "❌", "SUS", "🚫"],
+      chars: ["CAP", "FAKE", "NAH", "FALSE", "CAP", "SUS", "LIES", "HOAX"],
       speed: 10 + (i % 5) * 2,
       delay: (i % 4) * 1.2,
     })), []);
@@ -199,14 +199,14 @@ function DataRain() {
 // News ticker at bottom
 function NewsTicker() {
   const tickerItems = [
-    "⚠️ UNVERIFIED CLAIM DETECTED",
-    "🔍 FACT-CHECK IN PROGRESS",
-    "❌ MISINFORMATION ALERT",
-    "✓ VERIFIED BY 15+ SOURCES",
-    "⚠️ VIRAL HOAX SPREADING",
-    "🛡️ AI PROTECTION ACTIVE",
-    "📰 BREAKING: FAKE NEWS IDENTIFIED",
-    "🔒 SOURCE RELIABILITY: CHECKING",
+    "UNVERIFIED CLAIM DETECTED",
+    "FACT-CHECK IN PROGRESS",
+    "MISINFORMATION ALERT",
+    "VERIFIED BY 15+ SOURCES",
+    "VIRAL HOAX SPREADING",
+    "AI PROTECTION ACTIVE",
+    "BREAKING: FAKE NEWS IDENTIFIED",
+    "SOURCE RELIABILITY: CHECKING",
   ];
 
   return (
@@ -459,7 +459,7 @@ export function Hero() {
               transition={{ duration: 1.5, repeat: Infinity }}
               className="w-2 h-2 bg-green-400 rounded-full"
             />
-            <span>🧢 Cap Detector Active</span>
+            <span>Cap Detector Active</span>
           </Badge>
         </FadeIn>
 
@@ -482,13 +482,6 @@ export function Hero() {
               <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-orange-400 to-red-400">
                 Cap
               </span>
-              <motion.span
-                animate={{ rotate: [0, -10, 10, 0] }}
-                transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
-                className="absolute -top-2 -right-8 text-3xl"
-              >
-                🧢
-              </motion.span>
             </span>
             <span className="text-white">?</span>
           </motion.h1>
@@ -508,7 +501,7 @@ export function Hero() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <MagneticButton variant="primary" size="lg" href="#demo">
               <span className="flex items-center gap-2">
-                Check if it's cap 🧢
+                Check if it's cap
                 <motion.svg
                   animate={{ x: [0, 4, 0] }}
                   transition={{ duration: 1.5, repeat: Infinity }}

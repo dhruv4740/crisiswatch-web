@@ -71,15 +71,17 @@ interface GamificationState {
   streak: number;
   factScore: number;
   todayChecks: number; // Track checks done today
+  capsFound: number; // Track how many false/misleading claims detected
 }
 
 interface GamificationContextType {
   state: GamificationState;
-  incrementClaimsChecked: () => void;
+  incrementClaimsChecked: (isCap?: boolean) => void;
   getBadges: () => Badge[];
   getUnlockedBadges: () => Badge[];
   getNextBadge: () => Badge | null;
   getProgress: () => number;
+  getCapRate: () => number;
 }
 
 // Helper to get date string in YYYY-MM-DD format
@@ -104,6 +106,7 @@ const DEFAULT_STATE: GamificationState = {
   streak: 0,
   factScore: 0,
   todayChecks: 0,
+  capsFound: 0,
 };
 
 const GamificationContext = createContext<GamificationContextType | null>(null);
@@ -231,7 +234,7 @@ function BadgeUnlockNotification({ badge, onClose }: { badge: Badge; onClose: ()
               {badge.icon}
             </motion.div>
             <div>
-              <p className="text-white/80 text-sm font-medium mb-1">🎉 Badge Unlocked!</p>
+              <p className="text-white/80 text-sm font-medium mb-1">Badge Unlocked!</p>
               <h3 className="text-white text-xl font-bold">{badge.name}</h3>
               <p className="text-white/70 text-sm">{badge.description}</p>
             </div>
@@ -271,9 +274,10 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
     }
   }, [state, isLoaded]);
   
-  const incrementClaimsChecked = useCallback(() => {
+  const incrementClaimsChecked = useCallback((isCap: boolean = false) => {
     setState(prev => {
       const newCount = prev.claimsChecked + 1;
+      const newCapsFound = isCap ? prev.capsFound + 1 : prev.capsFound;
       const now = Date.now();
       const today = getDateString();
       
@@ -329,6 +333,7 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
         streak: newStreak,
         factScore: newFactScore,
         todayChecks: newTodayChecks,
+        capsFound: newCapsFound,
       };
     });
   }, []);
@@ -352,6 +357,12 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
     return Math.min(100, ((state.claimsChecked - start) / (end - start)) * 100);
   }, [state.claimsChecked, state.unlockedBadges, getNextBadge]);
   
+  // Get percentage of claims that were caps (false/misleading)
+  const getCapRate = useCallback(() => {
+    if (state.claimsChecked === 0) return 0;
+    return Math.round((state.capsFound / state.claimsChecked) * 100);
+  }, [state.capsFound, state.claimsChecked]);
+  
   return (
     <GamificationContext.Provider
       value={{
@@ -361,6 +372,7 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
         getUnlockedBadges,
         getProgress,
         getNextBadge,
+        getCapRate,
       }}
     >
       {children}
@@ -441,7 +453,7 @@ export function BadgeDisplay({ className = "" }: { className?: string }) {
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
       >
-        <span className="text-lg">🧢</span>
+        <span className="text-lg font-bold">F</span>
         <div className="text-left">
           <p className="text-xs text-dark-400">Fact Score</p>
           <p className="text-sm font-bold text-white">{state.factScore}</p>
@@ -483,7 +495,7 @@ export function BadgeDisplay({ className = "" }: { className?: string }) {
               </div>
               <div className="text-center p-2 rounded-lg bg-white/[0.03]">
                 <p className="text-lg font-bold text-orange-400">{state.streak}</p>
-                <p className="text-[10px] text-dark-500">Day Streak 🔥</p>
+                <p className="text-[10px] text-dark-500">Day Streak</p>
               </div>
               <div className="text-center p-2 rounded-lg bg-white/[0.03]">
                 <p className="text-lg font-bold text-white">{state.claimsChecked}</p>
@@ -545,8 +557,10 @@ export function BadgeDisplay({ className = "" }: { className?: string }) {
 export function useClaimCheck() {
   const { incrementClaimsChecked } = useGamification();
   
-  const onClaimChecked = useCallback(() => {
-    incrementClaimsChecked();
+  const onClaimChecked = useCallback((verdict?: string) => {
+    // Check if the verdict indicates false/misleading information (a "cap")
+    const isCap = verdict === 'FALSE' || verdict === 'MOSTLY_FALSE' || verdict === 'MISLEADING';
+    incrementClaimsChecked(isCap);
   }, [incrementClaimsChecked]);
   
   return { onClaimChecked };

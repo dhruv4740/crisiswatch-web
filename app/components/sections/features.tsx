@@ -13,7 +13,7 @@ const features = [
         <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
       </svg>
     ),
-    title: "Cap Detection 🧢",
+    title: "Cap Detection",
     description:
       "AI scans the internet 24/7 to catch fake news within minutes. We're always watching so you don't have to.",
   },
@@ -33,7 +33,7 @@ const features = [
         <path strokeLinecap="round" strokeLinejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
       </svg>
     ),
-    title: "Real-Time Progress ⚡",
+    title: "Real-Time Progress",
     description:
       "Watch us check each source live. Full verification in ~15 seconds with transparent progress updates.",
   },
@@ -63,7 +63,7 @@ const features = [
         <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" />
       </svg>
     ),
-    title: "Cap Stats 📊",
+    title: "Cap Stats",
     description:
       "Track what's trending in fake news. See the patterns and stay one step ahead of the BS.",
   },
@@ -149,7 +149,7 @@ export function Features() {
               <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
               <span className="text-sm text-dark-300">
                 Already caught <span className="text-white font-semibold">12,847</span> caps
-                today 🧢
+                today
               </span>
             </div>
           </div>

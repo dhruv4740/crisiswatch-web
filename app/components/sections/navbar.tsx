@@ -61,7 +61,7 @@ export function Navbar() {
                 {/* Cap icon */}
                 <div className="absolute inset-0 bg-gradient-to-br from-primary-500 to-accent-500 rounded-xl rotate-45 group-hover:rotate-[50deg] transition-transform duration-300" />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-lg font-bold text-white">🧢</span>
+                  <span className="text-lg font-bold text-white">F</span>
                 </div>
               </motion.div>
               <span className="text-xl font-display font-bold text-white">
@@ -89,10 +89,10 @@ export function Navbar() {
               <BadgeDisplay />
               {/* Hackathon badge */}
               <span className="text-xs px-3 py-1.5 rounded-full bg-accent-500/10 border border-accent-500/20 text-accent-400 font-medium">
-                🏆 Hackathon 2025
+                Hackathon 2025
               </span>
               <MagneticButton size="sm" variant="primary" href="#demo">
-                Check if it's cap 🧢
+                Check if it's cap
                 <svg
                   className="w-4 h-4 ml-1"
                   fill="none"
@@ -177,7 +177,7 @@ export function Navbar() {
                   className="pt-6 space-y-4"
                 >
                   <span className="inline-flex text-xs px-3 py-1.5 rounded-full bg-accent-500/10 border border-accent-500/20 text-accent-400 font-medium">
-                    🏆 Hackathon 2025
+                    Hackathon 2025
                   </span>
                   <MagneticButton variant="primary" className="w-full justify-center" href="#demo">
                     Try Demo

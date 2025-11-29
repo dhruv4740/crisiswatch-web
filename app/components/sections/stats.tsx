@@ -31,7 +31,7 @@ const stats = [
     value: 100,
     suffix: "%",
     label: "Free",
-    description: "No sign-up, no limits, no cap 🧢",
+    description: "No sign-up, no limits, no cap",
   },
 ];
 

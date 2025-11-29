@@ -245,21 +245,21 @@ const verdictColors = {
 // GenZ-style verdict display
 const getVerdictDisplay = (verdict: string): string => {
   switch (verdict) {
-    case "TRUE": return "NO CAP ✅";
-    case "FALSE": return "THAT'S CAP 🧢";
-    case "MOSTLY FALSE": return "MOSTLY CAP 🧢";
-    case "PARTIALLY TRUE": return "KINDA TRUE 🤷";
-    case "MOSTLY TRUE": return "LOWKEY TRUE ✅";
-    case "UNVERIFIED": return "CAN'T TELL 🤔";
+    case "TRUE": return "NO CAP";
+    case "FALSE": return "THAT'S CAP";
+    case "MOSTLY FALSE": return "MOSTLY CAP";
+    case "PARTIALLY TRUE": return "KINDA TRUE";
+    case "MOSTLY TRUE": return "LOWKEY TRUE";
+    case "UNVERIFIED": return "CAN'T TELL";
     default: return verdict;
   }
 };
 
 const analysisSteps = [
-  { id: "analyzing", label: "Reading", description: "Analyzing the tea you just spilled... ☕" },
-  { id: "searching", label: "Hunting", description: "Searching the entire internet for receipts... 🔍" },
-  { id: "cross-ref", label: "Checking", description: "Cross-referencing with the real ones... 📚" },
-  { id: "verdict", label: "Verdict", description: "Time to expose the truth... 💀" },
+  { id: "analyzing", label: "Reading", description: "Analyzing the tea you just spilled..." },
+  { id: "searching", label: "Hunting", description: "Searching the entire internet for receipts..." },
+  { id: "cross-ref", label: "Checking", description: "Cross-referencing with the real ones..." },
+  { id: "verdict", label: "Verdict", description: "Time to expose the truth..." },
 ];
 
 interface AnalysisResult {
@@ -312,18 +312,17 @@ function Toast({ message, onClose }: { message: string; onClose: () => void }) {
 // Share button component
 function ShareButton({ result, onShare }: { result: AnalysisResult; onShare: () => void }) {
   const handleShare = async () => {
-    const verdictEmoji = result.verdict === "TRUE" ? "✅" : result.verdict === "FALSE" ? "🧢" : "🤔";
-    const shareText = `${verdictEmoji} Cap Check Result:
+    const shareText = `Cap Check Result:
 
-🔍 Claim: "${result.claim}"
+Claim: "${result.claim}"
 
-${result.verdict === "FALSE" ? "🧢 THAT'S CAP" : result.verdict === "TRUE" ? "✅ NO CAP, IT'S REAL" : `📊 ${result.verdict}`}
-💯 Confidence: ${result.confidence}%
-📚 ${result.sources} sources checked
+${result.verdict === "FALSE" ? "THAT'S CAP" : result.verdict === "TRUE" ? "NO CAP, IT'S REAL" : result.verdict}
+Confidence: ${result.confidence}%
+${result.sources} sources checked
 
 ${result.explanation || ""}
 
-Checked with Fact or Cap 🧢`;
+Checked with Fact or Cap`;
 
     try {
       if (navigator.share) {
@@ -431,10 +430,11 @@ function RecentHistory({
 
 // Gamification Stats Component - visible in live demo section
 function GamificationStats() {
-  const { state, getUnlockedBadges, getNextBadge, getProgress } = useGamification();
+  const { state, getUnlockedBadges, getNextBadge, getProgress, getCapRate } = useGamification();
   const unlockedBadges = getUnlockedBadges();
   const nextBadge = getNextBadge();
   const progress = getProgress();
+  const capRate = getCapRate();
 
   return (
     <motion.div
@@ -444,21 +444,25 @@ function GamificationStats() {
     >
       <div className="flex items-center justify-between mb-3">
         <h4 className="text-sm font-semibold text-white flex items-center gap-2">
-          <span>🧢</span> Your Fact-Checking Stats
+          Your Fact-Checking Stats
         </h4>
         <div className="flex items-center gap-1">
           {state.streak > 0 && (
             <span className="text-xs px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-400">
-              🔥 {state.streak} day streak
+              {state.streak} day streak
             </span>
           )}
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-3 mb-4">
+      <div className="grid grid-cols-4 gap-2 mb-4">
         <div className="text-center p-2 rounded-lg bg-white/[0.05]">
           <p className="text-lg font-bold text-white">{state.todayChecks || 0}</p>
           <p className="text-[10px] text-dark-500">Today</p>
+        </div>
+        <div className="text-center p-2 rounded-lg bg-white/[0.05]">
+          <p className="text-lg font-bold text-red-400">{capRate}%</p>
+          <p className="text-[10px] text-dark-500">Caps Found</p>
         </div>
         <div className="text-center p-2 rounded-lg bg-white/[0.05]">
           <p className="text-lg font-bold text-primary-400">{state.factScore}</p>
@@ -508,7 +512,7 @@ function GamificationStats() {
       )}
 
       {!nextBadge && (
-        <p className="text-xs text-center text-primary-400">🎉 You've unlocked all badges!</p>
+        <p className="text-xs text-center text-primary-400">You've unlocked all badges!</p>
       )}
     </motion.div>
   );
@@ -861,7 +865,7 @@ export function LiveDemo() {
       stopStepProgression();
       setResult(analysisResult);
       addToHistory(analysisResult);
-      onClaimChecked();
+      onClaimChecked(analysisResult.verdict);
     } catch (err) {
       stopStepProgression();
       setError(err instanceof Error ? err.message : "An unexpected error occurred. Please try again.");
@@ -933,7 +937,7 @@ export function LiveDemo() {
       stopStepProgression();
       setResult(analysisResult);
       addToHistory(analysisResult);
-      onClaimChecked();
+      onClaimChecked(analysisResult.verdict);
     } catch {
       stopStepProgression();
       setResult({
@@ -982,7 +986,7 @@ export function LiveDemo() {
       <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8">
         <div className="text-center mb-16">
           <FadeIn>
-            <Badge variant="gradient">🧢 Cap Detector</Badge>
+            <Badge variant="gradient">Cap Detector</Badge>
           </FadeIn>
           <FadeIn delay={0.1}>
             <h2 className="text-display-md md:text-display-lg font-display font-bold mt-6 mb-6">
@@ -993,7 +997,7 @@ export function LiveDemo() {
           <FadeIn delay={0.2}>
             <p className="text-lg text-dark-400 max-w-2xl mx-auto">
               Paste that sus tweet, forward, or rumor you just saw. 
-              We'll tell you if it's cap or facts. No cap. 🧢
+              We'll tell you if it's cap or facts. No cap.
             </p>
           </FadeIn>
         </div>
@@ -1079,7 +1083,7 @@ export function LiveDemo() {
                         Analyzing...
                       </span>
                     ) : (
-                      "Is it cap? 🧢"
+                      "Is it cap?"
                     )}
                   </MagneticButton>
                 </div>
@@ -1197,14 +1201,14 @@ export function LiveDemo() {
                     >
                       {sourcesFound.length > 0 ? (
                         <p className="text-xs text-primary-400">
-                          📑 Got {sourcesFound.reduce((sum, s) => sum + s.count, 0)} receipts from{" "}
+                          Got {sourcesFound.reduce((sum, s) => sum + s.count, 0)} receipts from{" "}
                           {sourcesFound.map(s => s.name).join(", ")}
                         </p>
                       ) : progressMessage ? (
                         <p className="text-xs text-dark-400">{progressMessage}</p>
                       ) : (
                         <p className="text-xs text-dark-500">
-                          {backendAvailable ? "🕵️ Digging for the truth..." : "Demo mode active"}
+                          {backendAvailable ? "Digging for the truth..." : "Demo mode active"}
                         </p>
                       )}
                     </motion.div>
@@ -1264,11 +1268,11 @@ export function LiveDemo() {
                       </div>
                       <div className="text-center p-3 rounded-lg bg-white/[0.02]">
                         <p className="text-xl font-display font-bold text-white">{result.sources}</p>
-                        <p className="text-xs text-dark-500">Receipts 📑</p>
+                        <p className="text-xs text-dark-500">Sources</p>
                       </div>
                       <div className="text-center p-3 rounded-lg bg-white/[0.02]">
                         <p className="text-xl font-display font-bold text-white">{result.time}</p>
-                        <p className="text-xs text-dark-500">Speed ⚡</p>
+                        <p className="text-xs text-dark-500">Speed</p>
                       </div>
                     </div>
 

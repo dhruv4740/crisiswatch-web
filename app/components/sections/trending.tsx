@@ -23,22 +23,22 @@ interface TrendingResponse {
 }
 
 const CATEGORIES = [
-  { id: "all", label: "All", icon: "🔥" },
+  { id: "all", label: "All", icon: "" },
   { id: "politics", label: "Politics", icon: "🏛️" },
   { id: "health", label: "Health", icon: "🏥" },
   { id: "tech", label: "Tech", icon: "💻" },
-  { id: "climate", label: "Climate", icon: "🌍" },
-  { id: "finance", label: "Finance", icon: "💰" },
-  { id: "social", label: "Social", icon: "👥" },
+  { id: "climate", label: "Climate", icon: "" },
+  { id: "finance", label: "Finance", icon: "" },
+  { id: "social", label: "Social", icon: "" },
 ];
 
 const verdictConfig = {
-  TRUE: { label: "NO CAP ✅", color: "text-green-400", bg: "bg-green-500/20", border: "border-green-500/30" },
-  FALSE: { label: "THAT'S CAP 🧢", color: "text-red-400", bg: "bg-red-500/20", border: "border-red-500/30" },
+  TRUE: { label: "NO CAP", color: "text-green-400", bg: "bg-green-500/20", border: "border-green-500/30" },
+  FALSE: { label: "THAT'S CAP", color: "text-red-400", bg: "bg-red-500/20", border: "border-red-500/30" },
   MOSTLY_FALSE: { label: "MOSTLY CAP", color: "text-orange-400", bg: "bg-orange-500/20", border: "border-orange-500/30" },
   MOSTLY_TRUE: { label: "LOWKEY TRUE", color: "text-lime-400", bg: "bg-lime-500/20", border: "border-lime-500/30" },
   MIXED: { label: "IT'S COMPLICATED", color: "text-yellow-400", bg: "bg-yellow-500/20", border: "border-yellow-500/30" },
-  UNVERIFIABLE: { label: "CAN'T TELL 🤔", color: "text-gray-400", bg: "bg-gray-500/20", border: "border-gray-500/30" },
+  UNVERIFIABLE: { label: "CAN'T TELL", color: "text-gray-400", bg: "bg-gray-500/20", border: "border-gray-500/30" },
 };
 
 // Mock data for when backend endpoint is not ready
@@ -228,7 +228,7 @@ export function Trending() {
         {/* Header */}
         <div className="text-center mb-12">
           <FadeIn>
-            <Badge variant="gradient">🔥 Trending Now</Badge>
+            <Badge variant="gradient">Trending Now</Badge>
           </FadeIn>
           <FadeIn delay={0.1}>
             <h2 className="text-display-md md:text-display-lg font-display font-bold mt-6 mb-4">
@@ -288,7 +288,7 @@ export function Trending() {
               className="text-center py-16"
             >
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-white/[0.03] flex items-center justify-center">
-                <span className="text-2xl">🔍</span>
+                <span className="text-2xl text-dark-400">?</span>
               </div>
               <p className="text-dark-400">No trending claims in this category yet.</p>
             </motion.div>
@@ -310,22 +310,22 @@ export function Trending() {
         {/* Stats Footer */}
         <FadeIn delay={0.4}>
           <div className="mt-12 text-center">
-            <GlassCard className="inline-flex items-center gap-6 px-8 py-4" hoverEffect={false}>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-white">{formatNumber(claims.reduce((sum, c) => sum + c.checked_count, 0))}</p>
-                <p className="text-xs text-dark-500">Total Checks</p>
+            <GlassCard className="inline-flex flex-row items-center gap-4 sm:gap-6 px-4 sm:px-8 py-4" hoverEffect={false}>
+              <div className="text-center min-w-0">
+                <p className="text-lg sm:text-2xl font-bold text-white">{formatNumber(claims.reduce((sum, c) => sum + c.checked_count, 0))}</p>
+                <p className="text-xs text-dark-500 whitespace-nowrap">Total Checks</p>
               </div>
-              <div className="w-px h-10 bg-white/[0.1]" />
-              <div className="text-center">
-                <p className="text-2xl font-bold text-white">{claims.length}</p>
-                <p className="text-xs text-dark-500">Claims Tracked</p>
+              <div className="w-px h-8 sm:h-10 bg-white/[0.1] flex-shrink-0" />
+              <div className="text-center min-w-0">
+                <p className="text-lg sm:text-2xl font-bold text-white">{claims.length}</p>
+                <p className="text-xs text-dark-500 whitespace-nowrap">Claims Tracked</p>
               </div>
-              <div className="w-px h-10 bg-white/[0.1]" />
-              <div className="text-center">
-                <p className="text-2xl font-bold text-red-400">
+              <div className="w-px h-8 sm:h-10 bg-white/[0.1] flex-shrink-0" />
+              <div className="text-center min-w-0">
+                <p className="text-lg sm:text-2xl font-bold text-red-400">
                   {claims.filter(c => c.verdict === "FALSE" || c.verdict === "MOSTLY_FALSE").length}
                 </p>
-                <p className="text-xs text-dark-500">Debunked</p>
+                <p className="text-xs text-dark-500 whitespace-nowrap">Debunked</p>
               </div>
             </GlassCard>
           </div>

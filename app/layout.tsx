@@ -16,7 +16,7 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Fact or Cap 🧢 | Is That Claim Real or Cap?",
+  title: "Fact or Cap | Is That Claim Real or Cap?",
   description:
     "Drop any sus claim and we'll tell you if it's legit or straight cap. The vibe check for fake news. No more getting finessed by misinformation.",
   keywords: [
@@ -29,8 +29,11 @@ export const metadata: Metadata = {
     "truth detector",
   ],
   authors: [{ name: "Fact or Cap Team" }],
+  icons: {
+    icon: "/favicon.svg",
+  },
   openGraph: {
-    title: "Fact or Cap 🧢 | Is That Claim Real or Cap?",
+    title: "Fact or Cap | Is That Claim Real or Cap?",
     description:
       "Drop any sus claim and we'll tell you if it's legit or straight cap. No cap.",
     url: "https://factorcap.ai",
@@ -40,7 +43,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Fact or Cap 🧢 | Real-Time Fact Checker",
+    title: "Fact or Cap | Real-Time Fact Checker",
     description:
       "Is that viral claim real? Paste it and find out in seconds. AI-powered fact-checking.",
   },
