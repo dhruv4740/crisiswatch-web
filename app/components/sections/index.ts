@@ -4,5 +4,6 @@ export { Features } from "./features";
 export { HowItWorks } from "./how-it-works";
 export { Stats } from "./stats";
 export { LiveDemo } from "./live-demo";
+export { Trending } from "./trending";
 export { CTA } from "./cta";
 export { Footer } from "./footer";

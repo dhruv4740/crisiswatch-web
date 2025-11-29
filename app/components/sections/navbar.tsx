@@ -5,11 +5,13 @@ import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
 import Link from "next/link";
 import { cn } from "@/app/lib/utils";
 import { MagneticButton } from "../ui/magnetic-button";
+import { BadgeDisplay } from "../ui/gamification";
 
 const navItems = [
   { label: "Features", href: "#features" },
   { label: "How It Works", href: "#how-it-works" },
   { label: "Cap Check", href: "#demo" },
+  { label: "Trending", href: "#trending" },
 ];
 
 export function Navbar() {
@@ -83,6 +85,8 @@ export function Navbar() {
 
             {/* CTA Buttons */}
             <div className="hidden md:flex items-center gap-4">
+              {/* Badge Display */}
+              <BadgeDisplay />
               {/* Hackathon badge */}
               <span className="text-xs px-3 py-1.5 rounded-full bg-accent-500/10 border border-accent-500/20 text-accent-400 font-medium">
                 🏆 Hackathon 2025

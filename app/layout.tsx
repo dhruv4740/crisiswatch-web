@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
+import { Providers } from "./providers";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -70,7 +71,9 @@ export default function RootLayout({
         />
 
         {/* Main content */}
-        <main className="relative">{children}</main>
+        <Providers>
+          <main className="relative">{children}</main>
+        </Providers>
       </body>
     </html>
   );

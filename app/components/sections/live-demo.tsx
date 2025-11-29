@@ -7,6 +7,8 @@ import { MagneticButton } from "../ui/magnetic-button";
 import { GradientText, Badge } from "../ui/gradient-text";
 import { ProgressStepper, ConnectionStatus, ErrorDisplay } from "../ui/progress-stepper";
 import { FadeIn } from "../animations/motion";
+import { ShareVerdictButton } from "../ui/verdict-card";
+import { useClaimCheck } from "../ui/gamification";
 
 // Helper function to format date in IST timezone
 const formatDateIST = (dateString?: string): string | null => {
@@ -796,7 +798,12 @@ export function LiveDemo() {
                 <h3 className="text-xl font-display font-semibold text-white">
                   Verification Result
                 </h3>
-                {result && <ShareButton result={result} onShare={() => setToastMessage("Result copied to clipboard!")} />}
+                {result && (
+                  <div className="flex items-center gap-2">
+                    <ShareVerdictButton result={result} />
+                    <ShareButton result={result} onShare={() => setToastMessage("Result copied to clipboard!")} />
+                  </div>
+                )}
               </div>
 
               <AnimatePresence mode="wait">

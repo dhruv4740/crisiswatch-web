@@ -5,6 +5,7 @@ import {
   HowItWorks,
   Stats,
   LiveDemo,
+  Trending,
   CTA,
   Footer,
 } from "./components/sections";
@@ -18,6 +19,7 @@ export default function Home() {
       <HowItWorks />
       <Stats />
       <LiveDemo />
+      <Trending />
       <CTA />
       <Footer />
     </>
